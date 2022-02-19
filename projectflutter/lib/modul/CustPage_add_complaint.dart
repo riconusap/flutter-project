@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class AddComplaint extends StatefulWidget {
   _AddData createState() => _AddData();
@@ -8,9 +9,13 @@ class AddComplaint extends StatefulWidget {
 
 class _AddData extends State<AddComplaint> {
   List<Asset> images = [];
+
   Widget buildGridView() {
     return GridView.count(
       crossAxisCount: 3,
+      crossAxisSpacing: 7,
+      mainAxisSpacing: 7,
+      padding: EdgeInsets.all(14),
       children: List.generate(images.length, (index) {
         Asset asset = images[index];
         return AssetThumb(
@@ -25,18 +30,13 @@ class _AddData extends State<AddComplaint> {
   Future<void> loadAssets() async {
     List<Asset> resultList = <Asset>[];
     String error = 'No Error Detected';
-
     try {
       resultList = await MultiImagePicker.pickImages(
         maxImages: 300,
         enableCamera: true,
         selectedAssets: images,
-        cupertinoOptions: CupertinoOptions(
-          takePhotoIcon: "chat",
-          doneButtonTitle: "Fatto",
-        ),
         materialOptions: MaterialOptions(
-          actionBarColor: "#abcdef",
+          actionBarColor: "#0ff86C",
           actionBarTitle: "Example App",
           allViewTitle: "All Photos",
           useDetailsView: false,
@@ -94,63 +94,87 @@ class _AddData extends State<AddComplaint> {
                       Color(0xff139487),
                       Color(0xff86C6F4),
                     ])),
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        alignment: Alignment.center,
-                        width: 360,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 6,
-                                  offset: Offset(0, 2))
-                            ]),
-                        height: 60,
-                        child: TextField(
-                          // controller: email,
-                          keyboardType: TextInputType.emailAddress,
-                          style: TextStyle(color: Colors.black87),
-                          decoration: InputDecoration(
-                              hintText: 'Jenis Komplain',
-                              hintStyle: TextStyle(color: Colors.black38),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(14),
-                              prefixIcon: Icon(
-                                Icons.build,
-                                color: Color(0xff139487),
-                              )),
-                        ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      alignment: Alignment.center,
+                      width: 360,
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 6,
+                                offset: Offset(0, 2))
+                          ]),
+                      height: 60,
+                      child: TextField(
+                        // controller: email,
+                        keyboardType: TextInputType.emailAddress,
+                        style: TextStyle(color: Colors.black87),
+                        decoration: InputDecoration(
+                            hintText: 'Jenis Komplain',
+                            hintStyle: TextStyle(color: Colors.black38),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(14),
+                            prefixIcon: Icon(
+                              Icons.build,
+                              color: Color(0xff139487),
+                            )),
                       ),
-                      SizedBox(height: 30),
-                      ElevatedButton(
-                          onPressed: () {
-                            loadAssets();
-                          },
-                          style: ElevatedButton.styleFrom(
-                              primary: Color(0xff139487),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 50, vertical: 20),
-                              fixedSize: const Size(360, 70),
-                              textStyle: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Icon(Icons.filter),
-                              SizedBox(width: 10),
-                              Text("Tambah Foto")
-                            ],
-                          )),
-                      SizedBox(height: 30),
-                    ],
-                  ),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                        onPressed: () {
+                          loadAssets();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            primary: Color(0xff139487),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 20),
+                            fixedSize: const Size(360, 70),
+                            textStyle: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.filter),
+                            SizedBox(width: 10),
+                            Text("Tambah Foto")
+                          ],
+                        )),
+                    SizedBox(height: 30),
+                    Expanded(
+                      child: buildGridView(),
+                    ),
+                    SizedBox(height: 30),
+                    ElevatedButton(
+                        onPressed: () {
+                          // loadAssets();
+                        },
+                        style: ElevatedButton.styleFrom(
+                            primary: Color(0xff139487),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 50, vertical: 20),
+                            fixedSize: const Size(360, 70),
+                            textStyle: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Icon(Icons.filter),
+                            SizedBox(width: 10),
+                            Text("Tambah Foto")
+                          ],
+                        )),
+                    SizedBox(height: 30),
+                  ],
                 ),
               )
             ],
