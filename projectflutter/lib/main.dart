@@ -5,6 +5,8 @@ import 'CsPage.dart';
 import 'CustPage.dart';
 import 'TekPage.dart';
 import 'modul/CustPage_add_complaint.dart';
+import 'modul/cust_complaint_history.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
           '/CustPage': (BuildContext context) => new CustPage(),
           '/logout': (BuildContext context) => new LoginUI(),
           '/addData': (BuildContext context) => new AddComplaint(),
+          '/checkHistory': (BuildContext context) => new CustHistori(),
         });
   }
 }

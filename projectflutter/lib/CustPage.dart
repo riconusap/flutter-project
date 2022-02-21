@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// String finalemail = "";
+
 class CustPage extends StatefulWidget {
   @override
   _CustPage createState() => _CustPage();
@@ -11,15 +13,51 @@ enum LoginStatus { notSignIn, signIn }
 
 class _CustPage extends State<CustPage> {
   LoginStatus _loginStatus = LoginStatus.signIn;
+  String email = "";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initial();
+  }
+
+  void initial() async {
+    SharedPreferences logindata = await SharedPreferences.getInstance();
+
+    setState(() {
+      email = logindata.getString('email').toString();
+    });
+  }
+
+  // Future getValidationLogin() async {
+  //   final SharedPreferences sharedPreferences =
+  //       await SharedPreferences.getInstance();
+  //   var obtainEmail = sharedPreferences.getString('email').toString();
+  //   finalemail = obtainEmail;
+  //   setState(() {
+  //     finalemail = obtainEmail;
+  //   });
+  // }
+
+  // Future<void> setValidationLogin() async {
+  //   final jembatan = await SharedPreferences.getInstance();
+  //   setState(() {});
+  // }
 
   _logout() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    setState(() {
-      // preferences.setInt("value", null);
-      preferences.commit();
-      _loginStatus = LoginStatus.notSignIn;
-      Navigator.pushReplacementNamed(context, '/logout');
-    });
+    SharedPreferences logindata = await SharedPreferences.getInstance();
+    logindata.setBool('login', true);
+    // final jembatan = await SharedPreferences.getInstance();
+    // finalemail = "";
+    // jembatan.setString('email', finalemail);
+    Navigator.pushReplacementNamed(context, '/logout');
+    // SharedPreferences preferences = await SharedPreferences.getInstance();
+    // setState(() {
+    //   finalemail = "";
+    //   _loginStatus = LoginStatus.notSignIn;
+
+    // });
   }
 
   addData() {
@@ -28,8 +66,16 @@ class _CustPage extends State<CustPage> {
     });
   }
 
+  checkHistory() {
+    setState(() {
+      Navigator.pushReplacementNamed(context, '/checkHistory');
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    print("object");
+    // getValidationLogin();
     return Scaffold(
         body: AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.light,
@@ -52,6 +98,7 @@ class _CustPage extends State<CustPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      Text('Hello $email'),
                       SizedBox(height: 10),
                       Image.asset('assets/image/logo.png'),
                       SizedBox(height: 20),
@@ -71,7 +118,9 @@ class _CustPage extends State<CustPage> {
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          checkHistory();
+                        },
                         style: ElevatedButton.styleFrom(
                             primary: Color(0xff139487),
                             padding: EdgeInsets.symmetric(

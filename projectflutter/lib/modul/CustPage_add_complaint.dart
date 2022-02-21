@@ -1,7 +1,11 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:multi_image_picker2/multi_image_picker2.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:projectflutter/config.dart';
+import 'package:projectflutter/login_page.dart';
 
 class AddComplaint extends StatefulWidget {
   _AddData createState() => _AddData();
@@ -9,6 +13,7 @@ class AddComplaint extends StatefulWidget {
 
 class _AddData extends State<AddComplaint> {
   List<Asset> images = [];
+  Dio dio = Dio();
 
   Widget buildGridView() {
     return GridView.count(
@@ -36,8 +41,9 @@ class _AddData extends State<AddComplaint> {
         enableCamera: true,
         selectedAssets: images,
         materialOptions: MaterialOptions(
-          actionBarColor: "#0ff86C",
-          actionBarTitle: "Example App",
+          actionBarColor: "#219F94",
+          actionBarTitle: "Pilih Foto",
+          statusBarColor: "#219F94",
           allViewTitle: "All Photos",
           useDetailsView: false,
           selectCircleStrokeColor: "#000000",
@@ -61,6 +67,22 @@ class _AddData extends State<AddComplaint> {
   void initState() {
     // TODO: implement initState
     super.initState();
+  }
+
+  _SaveImage() async {
+    if (images != null) {
+      for (var i = 0; i < images.length; i++) {
+        ByteData byteData = await images[i].getByteData();
+        List<int> imageData = byteData.buffer.asUint8List();
+        MultipartFile multipartFile = MultipartFile.fromBytes(imageData,
+            filename: images[i].name, contentType: MediaType('image', 'jpg'));
+        FormData formData = FormData.fromMap({"image": multipartFile});
+        var response = await dio.post(UPLOAD_URL, data: formData);
+        if (response.statusCode == 200) {
+          print(response.data);
+        }
+      }
+    }
   }
 
   @override
@@ -154,7 +176,7 @@ class _AddData extends State<AddComplaint> {
                     SizedBox(height: 30),
                     ElevatedButton(
                         onPressed: () {
-                          // loadAssets();
+                          _SaveImage();
                         },
                         style: ElevatedButton.styleFrom(
                             primary: Color(0xff139487),
@@ -168,9 +190,9 @@ class _AddData extends State<AddComplaint> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[
-                            Icon(Icons.filter),
+                            Icon(Icons.save),
                             SizedBox(width: 10),
-                            Text("Tambah Foto")
+                            Text("Submit")
                           ],
                         )),
                     SizedBox(height: 30),

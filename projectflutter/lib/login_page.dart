@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:projectflutter/CustPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginUI extends StatefulWidget {
@@ -17,9 +18,42 @@ class _LoginUI extends State<LoginUI> {
   TextEditingController email = new TextEditingController();
   TextEditingController pass = new TextEditingController();
   String msg = "";
+  String _id_user = "";
+  bool newuser = false;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    check_if_already_login();
+  }
+
+  void check_if_already_login() async {
+    SharedPreferences logindata = await SharedPreferences.getInstance();
+    newuser = (logindata.getBool('login') ?? true);
+    print(newuser);
+    if (newuser == false) {
+      Navigator.pushReplacement(
+          context, new MaterialPageRoute(builder: (context) => CustPage()));
+    }
+  }
+
+  // Future<void> getValidationLogin() async {
+  //   final SharedPreferences sharedPreferences =
+  //       await SharedPreferences.getInstance();
+  //   String cekEmail = sharedPreferences.getString('email').toString();
+  //   if (cekEmail != null) {
+  //     Navigator.of(context)
+  //         .push(MaterialPageRoute(builder: (context) => CustPage()));
+  //   } else {
+  //     Navigator.pushReplacementNamed(context, '/logout');
+  //   }
+  // }
+
   LoginStatus _loginStatus = LoginStatus.notSignIn;
 
   Future<List?> _login() async {
+    SharedPreferences logindata = await SharedPreferences.getInstance();
     final response = await http.post(
         Uri.parse("https://sdarrahman.000webhostapp.com/login.php"),
         body: {
@@ -29,33 +63,57 @@ class _LoginUI extends State<LoginUI> {
     // ignore: avoid_print
     print(response.body);
     var user = json.decode(response.body);
+
+    // Future<void> setValidationLogin() async {
+    //   final jembatan = await SharedPreferences.getInstance();
+    //   if (jembatan.containsKey('email')) {
+    //     jembatan.clear();
+    //   }
+    //   final finalemail = user["email"][0].toString();
+    //   jembatan.setString('email', finalemail);
+    //   setState(() {});
+    // }
+
     if (user.length == 0) {
       setState(() {
         msg = "Login Failed";
       });
-    } else if (user[0]["level"] == "cs") {
-      setState(() {
-        _loginStatus = LoginStatus.signIn;
-        Navigator.pushReplacementNamed(context, '/CsPage');
-      });
-    } else if (user[0]["level"] == "customer") {
-      setState(() {
-        _loginStatus = LoginStatus.signIn;
-        Navigator.pushReplacementNamed(context, '/CustPage');
-      });
-    } else if (user[0]["level"] == "teknisi") {
-      setState(() {
-        Navigator.pushReplacementNamed(context, '/TekPage');
-      });
     } else {
+      logindata.setBool('login', false);
+      logindata.setString('email', email.text);
+      String id_user = user[0]['id_user'].toString();
+      if (user[0]["level"] == "cs") {
+        setState(() {
+          _loginStatus = LoginStatus.signIn;
+          Navigator.pushReplacementNamed(context, '/CsPage');
+        });
+      } else if (user[0]["level"] == "customer") {
+        setState(() {
+          _loginStatus = LoginStatus.signIn;
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (context) => CustPage()));
+          // setValidationLogin();
+        });
+      } else if (user[0]["level"] == "teknisi") {
+        setState(() {
+          Navigator.pushReplacementNamed(context, '/TekPage');
+        });
+      } else {
+        setState(() {
+          msg = "";
+        });
+      }
       setState(() {
-        msg = "";
+        id_user = user[0]['id_user'];
       });
     }
+    return user;
   }
 
   @override
   Widget build(BuildContext context) {
+    // getValidationLogin();
+    // print("test");
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -152,7 +210,7 @@ class _LoginUI extends State<LoginUI> {
                   ),
                   SizedBox(height: 10),
                   ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       _login();
                     },
                     style: ElevatedButton.styleFrom(
