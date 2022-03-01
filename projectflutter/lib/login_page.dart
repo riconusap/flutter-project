@@ -18,7 +18,7 @@ class _LoginUI extends State<LoginUI> {
   TextEditingController email = new TextEditingController();
   TextEditingController pass = new TextEditingController();
   String msg = "";
-  String _id_user = "";
+  String emailSet = "";
   bool newuser = false;
 
   @override
@@ -52,7 +52,7 @@ class _LoginUI extends State<LoginUI> {
 
   LoginStatus _loginStatus = LoginStatus.notSignIn;
 
-  Future<List?> _login() async {
+  Future<List> _login() async {
     SharedPreferences logindata = await SharedPreferences.getInstance();
     final response = await http.post(
         Uri.parse("https://sdarrahman.000webhostapp.com/login.php"),
@@ -79,9 +79,9 @@ class _LoginUI extends State<LoginUI> {
         msg = "Login Failed";
       });
     } else {
+      emailSet = user[0]['email'].toString();
       logindata.setBool('login', false);
-      logindata.setString('email', email.text);
-      String id_user = user[0]['id_user'].toString();
+      logindata.setString('email', emailSet);
       if (user[0]["level"] == "cs") {
         setState(() {
           _loginStatus = LoginStatus.signIn;
@@ -103,9 +103,6 @@ class _LoginUI extends State<LoginUI> {
           msg = "";
         });
       }
-      setState(() {
-        id_user = user[0]['id_user'];
-      });
     }
     return user;
   }
@@ -115,6 +112,7 @@ class _LoginUI extends State<LoginUI> {
     // getValidationLogin();
     // print("test");
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
